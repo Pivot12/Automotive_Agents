@@ -341,43 +341,46 @@ def main():
     selected_market = st.selectbox("Select a market (or let the system detect it):", ["Auto-detect"] + market_options)
     
     if st.button("Process Query"):
-        if query:
-            with st.spinner("Processing your query..."):
-                logger.info(f"Processing query: {query}")
+    if query:
+        with st.spinner("Processing your query..."):
+            logger.info(f"Processing query: {query}")
+            
+            # Set market if manually selected
+            market = "" if selected_market == "Auto-detect" else selected_market
+            
+            # Run the graph
+            try:
+                logger.info(f"Starting graph execution with market: {market or 'Auto-detect'}")
+                state = AgentState(query=query, market=market)
+                result = graph.invoke(state)
+                logger.info("Graph execution completed")
                 
-                # Set market if manually selected
-                market = "" if selected_market == "Auto-detect" else selected_market
+                # Display results
+                st.subheader("Results")
                 
-                # Run the graph
-                try:
-                    logger.info(f"Starting graph execution with market: {market or 'Auto-detect'}")
-                    state = AgentState(query=query, market=market)
-                    result = graph.invoke(state)
-                    logger.info("Graph execution completed")
-                    
-                    # Display results
-                    st.subheader("Results")
-                    
-                    if result.market != "UNCLEAR":
-                        st.write(f"Market: {result.market}")
-                    else:
-                        st.error("Could not determine market automatically. Please select a market.")
-                        market_options = list(REGULATORY_WEBSITES.keys())
-                        selected_market = st.selectbox("Please select a market:", market_options)
-                        if st.button("Confirm Market"):
-                            state = AgentState(query=query, market=selected_market)
-                            result = graph.invoke(state)
-                    
-                    st.write(f"Website: {result.selected_url}")
-                    
-                    st.subheader("Documents Analyzed")
-                    if result.pdf_urls:
-                        for title, url in result.pdf_urls:
-                            st.write(f"- {title} ([link]({url}))")
-                    else:
-                        st.write("No documents were found or selected.")
-                    
-                    st.subheader("Answer")
-                    st.write(result.final_answer)
-                except Exception as e:
-                    logger.
+                if result.market != "UNCLEAR":
+                    st.write(f"Market: {result.market}")
+                else:
+                    st.error("Could not determine market automatically. Please select a market.")
+                    market_options = list(REGULATORY_WEBSITES.keys())
+                    selected_market = st.selectbox("Please select a market:", market_options)
+                    if st.button("Confirm Market"):
+                        state = AgentState(query=query, market=selected_market)
+                        result = graph.invoke(state)
+                
+                st.write(f"Website: {result.selected_url}")
+                
+                st.subheader("Documents Analyzed")
+                if result.pdf_urls:
+                    for title, url in result.pdf_urls:
+                        st.write(f"- {title} ([link]({url}))")
+                else:
+                    st.write("No documents were found or selected.")
+                
+                st.subheader("Answer")
+                st.write(result.final_answer)
+            except Exception as e:
+                logger.error(f"Error during graph execution: {str(e)}")
+                st.error(f"An error occurred while processing your query: {str(e)}")
+    else:
+        st.warning("Please enter a query.")
