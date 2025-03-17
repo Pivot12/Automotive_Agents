@@ -8,7 +8,8 @@ import streamlit as st
 import pandas as pd
 from groq import Groq
 from bs4 import BeautifulSoup
-from langchain.pydantic_v1 import BaseModel, Field
+from typing import Dict, List, Any
+from pydantic import BaseModel, Field
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langgraph.graph import END, StateGraph, START
 import logging
@@ -35,15 +36,15 @@ class AgentState(BaseModel):
     query: str = Field(default="")
     market: str = Field(default="")
     selected_url: str = Field(default="")
-    pdf_urls: list = Field(default_factory=list)
-    pdf_contents: dict = Field(default_factory=dict)
+    pdf_urls: List[tuple] = Field(default_factory=list)
+    pdf_contents: Dict[str, str] = Field(default_factory=dict)
     final_answer: str = Field(default="")
 
 # Define state graph nodes
-def get_market(state):
+def get_market(state: Dict[str, Any]) -> Dict[str, Any]:
     """Determine which market to look for regulatory documents."""
     logger.info("Starting market determination...")
-    query = state.query
+    query = state["query"]
     
     prompt = f"""
     Based on the following query, determine which automotive regulatory market the user is interested in (US, EU, China, India, or Australia).
@@ -74,10 +75,10 @@ def get_market(state):
         logger.error(f"Error determining market: {str(e)}")
         return {"market": "UNCLEAR"}
 
-def select_url(state):
+def select_url(state: Dict[str, Any]) -> Dict[str, Any]:
     """Select the appropriate regulatory website based on market."""
     logger.info("Selecting URL based on market...")
-    market = state.market
+    market = state["market"]
     
     if market in REGULATORY_WEBSITES:
         selected_url = REGULATORY_WEBSITES[market]
@@ -87,11 +88,11 @@ def select_url(state):
         logger.warning(f"Market {market} not found in regulatory websites")
         return {"selected_url": "UNCLEAR"}
 
-def extract_pdf_links(state):
+def extract_pdf_links(state: Dict[str, Any]) -> Dict[str, Any]:
     """Extract PDF links from the regulatory website."""
     logger.info("Extracting PDF links...")
-    url = state.selected_url
-    query = state.query
+    url = state["selected_url"]
+    query = state["query"]
     
     try:
         logger.info(f"Fetching content from {url}")
@@ -155,10 +156,10 @@ def extract_pdf_links(state):
         logger.error(f"Error extracting PDF links: {str(e)}")
         return {"pdf_urls": []}
 
-def download_and_process_pdfs(state):
+def download_and_process_pdfs(state: Dict[str, Any]) -> Dict[str, Any]:
     """Download PDFs and extract content."""
     logger.info("Downloading and processing PDFs...")
-    pdf_urls = state.pdf_urls
+    pdf_urls = state["pdf_urls"]
     pdf_contents = {}
     
     for title, url in pdf_urls:
@@ -190,11 +191,11 @@ def download_and_process_pdfs(state):
     
     return {"pdf_contents": pdf_contents}
 
-def analyze_content(state):
+def analyze_content(state: Dict[str, Any]) -> Dict[str, Any]:
     """Analyze PDF content and generate answer."""
     logger.info("Analyzing content...")
-    query = state.query
-    pdf_contents = state.pdf_contents
+    query = state["query"]
+    pdf_contents = state["pdf_contents"]
     
     # Combine all contents
     combined_text = ""
@@ -271,6 +272,8 @@ def analyze_content(state):
 # Define the state graph
 def build_graph():
     logger.info("Building state graph...")
+    
+    # Initialize with dictionary state instead of Pydantic model
     workflow = StateGraph(AgentState)
     
     # Add nodes
@@ -280,14 +283,14 @@ def build_graph():
     workflow.add_node("download_and_process_pdfs", download_and_process_pdfs)
     workflow.add_node("analyze_content", analyze_content)
     
-    # Add the START edge - this was missing in the previous code
+    # Add the START edge
     workflow.add_edge(START, "get_market")
     
     # Add edges
     workflow.add_edge("get_market", "select_url")
     workflow.add_conditional_edges(
         "get_market",
-        lambda state: "select_url" if state.market != "UNCLEAR" else "get_market",
+        lambda state: "select_url" if state.get("market") != "UNCLEAR" else "get_market",
         {
             "select_url": "select_url",
             "get_market": "get_market"
@@ -317,7 +320,7 @@ def main():
         def emit(self, record):
             log_record = self.format(record)
             log_output.append(log_record)
-            log_placeholder.text('\n'.join(log_output))
+            log_placeholder.text('\n'.join(log_output[-30:]))  # Keep only last 30 logs
     
     # Add the streamlit handler to the logger
     streamlit_handler = StreamlitLogHandler()
@@ -354,39 +357,34 @@ def main():
                 # Run the graph
                 try:
                     logger.info(f"Starting graph execution with market: {market or 'Auto-detect'}")
-                    state = AgentState(query=query, market=market)
-                    result = graph.invoke(state)
+                    # Create input state as dictionary
+                    input_state = {"query": query, "market": market, "selected_url": "", "pdf_urls": [], "pdf_contents": {}, "final_answer": ""}
+                    result = graph.invoke(input_state)
                     logger.info("Graph execution completed")
                     
                     # Display results
                     st.subheader("Results")
                     
-                    if result.market != "UNCLEAR":
-                        st.write(f"Market: {result.market}")
+                    if result.get("market") and result["market"] != "UNCLEAR":
+                        st.write(f"Market: {result['market']}")
                     else:
                         st.error("Could not determine market automatically. Please select a market.")
-                        market_options = list(REGULATORY_WEBSITES.keys())
                         selected_market = st.selectbox("Please select a market:", market_options, key="market_select_after_error")
                         if st.button("Confirm Market", key="confirm_market_button"):
-                            state = AgentState(query=query, market=selected_market)
-                            result = graph.invoke(state)
+                            input_state = {"query": query, "market": selected_market, "selected_url": "", "pdf_urls": [], "pdf_contents": {}, "final_answer": ""}
+                            result = graph.invoke(input_state)
                     
-                    st.write(f"Website: {result.selected_url}")
+                    st.write(f"Website: {result.get('selected_url', 'Not specified')}")
                     
                     st.subheader("Documents Analyzed")
-                    if result.pdf_urls:
-                        for title, url in result.pdf_urls:
-                            st.write(f"- {title} ([link]({url}))")
-                    else:
-                        st.subheader("Documents Analyzed")
-                    if result.pdf_urls:
-                        for title, url in result.pdf_urls:
+                    if result.get("pdf_urls"):
+                        for title, url in result["pdf_urls"]:
                             st.write(f"- {title} ([link]({url}))")
                     else:
                         st.write("No documents were found or selected.")
                     
                     st.subheader("Answer")
-                    st.write(result.final_answer)
+                    st.write(result.get("final_answer", "No answer generated"))
                 except Exception as e:
                     logger.error(f"Error during graph execution: {str(e)}")
                     st.error(f"An error occurred while processing your query: {str(e)}")
@@ -401,6 +399,11 @@ def main():
     2. Either select a specific market or let the system auto-detect it
     3. Click "Process Query" to start the analysis
     4. The system will identify relevant documents and provide an answer based on their content
+    
+    ## Example queries
+    - "What are the crash test requirements for passenger vehicles in the US?"
+    - "Explain the emission standards for electric vehicles in the EU"
+    - "What are the approval procedures for importing vehicles to Australia?"
     """)
 
 if __name__ == "__main__":
