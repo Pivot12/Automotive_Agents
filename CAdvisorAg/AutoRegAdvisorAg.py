@@ -1,4 +1,4 @@
-!pip install streamlit requests PyPDF2 beautifulsoup4 pandas groq langgraph langchain-groq
+# pip install streamlit requests PyPDF2 beautifulsoup4 pandas groq langgraph langchain-groq
 import os
 import re
 import requests
