@@ -450,8 +450,8 @@ def create_simple_agent():
 
 # Streamlit UI
 def main():
-    st.set_page_config(page_title="Automotive Regulatory Document Assistant", layout="wide")
-    st.title("Automotive Regulatory Document Assistant")
+    st.set_page_config(page_title="Automotive Regulations AI Agent", layout="wide")
+    st.title("Automotive Regulations AI Agent")
     
     # Sidebar for logs
     st.sidebar.title("Execution Logs")
