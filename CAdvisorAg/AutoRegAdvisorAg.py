@@ -10,7 +10,7 @@ from groq import Groq
 from bs4 import BeautifulSoup
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langgraph.graph import END, StateGraph
+from langgraph.graph import END, StateGraph, START
 import logging
 
 # Set up logging
@@ -280,6 +280,9 @@ def build_graph():
     workflow.add_node("download_and_process_pdfs", download_and_process_pdfs)
     workflow.add_node("analyze_content", analyze_content)
     
+    # Add the START edge - this was missing in the previous code
+    workflow.add_edge(START, "get_market")
+    
     # Add edges
     workflow.add_edge("get_market", "select_url")
     workflow.add_conditional_edges(
@@ -347,14 +350,14 @@ def main():
                 
                 # Set market if manually selected
                 market = "" if selected_market == "Auto-detect" else selected_market
-            
-            # Run the graph
+                
+                # Run the graph
                 try:
                     logger.info(f"Starting graph execution with market: {market or 'Auto-detect'}")
                     state = AgentState(query=query, market=market)
                     result = graph.invoke(state)
                     logger.info("Graph execution completed")
-                
+                    
                     # Display results
                     st.subheader("Results")
                     
@@ -363,11 +366,11 @@ def main():
                     else:
                         st.error("Could not determine market automatically. Please select a market.")
                         market_options = list(REGULATORY_WEBSITES.keys())
-                        selected_market = st.selectbox("Please select a market:", market_options)
-                        if st.button("Confirm Market"):
+                        selected_market = st.selectbox("Please select a market:", market_options, key="market_select_after_error")
+                        if st.button("Confirm Market", key="confirm_market_button"):
                             state = AgentState(query=query, market=selected_market)
                             result = graph.invoke(state)
-                
+                    
                     st.write(f"Website: {result.selected_url}")
                     
                     st.subheader("Documents Analyzed")
@@ -375,16 +378,22 @@ def main():
                         for title, url in result.pdf_urls:
                             st.write(f"- {title} ([link]({url}))")
                     else:
+                        st.subheader("Documents Analyzed")
+                    if result.pdf_urls:
+                        for title, url in result.pdf_urls:
+                            st.write(f"- {title} ([link]({url}))")
+                    else:
                         st.write("No documents were found or selected.")
-                
+                    
                     st.subheader("Answer")
                     st.write(result.final_answer)
                 except Exception as e:
                     logger.error(f"Error during graph execution: {str(e)}")
                     st.error(f"An error occurred while processing your query: {str(e)}")
-    else:
-        st.warning("Please enter a query.")
- # Add some usage instructions
+        else:
+            st.warning("Please enter a query.")
+
+    # Add some usage instructions
     st.markdown("---")
     st.markdown("""
     ## How to use this tool
