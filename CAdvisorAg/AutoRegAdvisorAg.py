@@ -343,10 +343,10 @@ def main():
     if st.button("Process Query"):
         if query:
             with st.spinner("Processing your query..."):
-            logger.info(f"Processing query: {query}")
-            
-            # Set market if manually selected
-            market = "" if selected_market == "Auto-detect" else selected_market
+                logger.info(f"Processing query: {query}")
+                
+                # Set market if manually selected
+                market = "" if selected_market == "Auto-detect" else selected_market
             
             # Run the graph
                 try:
