@@ -379,8 +379,8 @@ def main():
                 
                     st.subheader("Answer")
                     st.write(result.final_answer)
-            except Exception as e:
-                logger.error(f"Error during graph execution: {str(e)}")
-                st.error(f"An error occurred while processing your query: {str(e)}")
+                except Exception as e:
+                    logger.error(f"Error during graph execution: {str(e)}")
+                    st.error(f"An error occurred while processing your query: {str(e)}")
     else:
         st.warning("Please enter a query.")
