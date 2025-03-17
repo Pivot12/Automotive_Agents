@@ -1,0 +1,9 @@
+streamlit
+requests
+PyPDF2
+beautifulsoup4
+pandas
+groq
+langgraph
+langchain
+langchain-groq
