@@ -553,10 +553,10 @@ def main():
             st.warning("Please enter a query.")
     
     # The architecture diagram
-   st.markdown("---")
-   st.subheader("How This Application Works")
+    st.markdown("---")
+    st.subheader("How This Application Works")
    # Create a collapsible section for the diagram
-   with st.expander("Click to view the application architecture diagram"):
+    with st.expander("Click to view the application architecture diagram"):
        # Mermaid diagram code - simplified to avoid syntax errors
        mermaid_diagram = """
        flowchart TD
