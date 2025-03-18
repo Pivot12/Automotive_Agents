@@ -555,7 +555,7 @@ def main():
     
     # The architecture diagram
     st.markdown("---")
-    st.subheader("How This Application Works")
+    st.subheader("How This AI Agent Works")
     # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
        # Mermaid diagram code
