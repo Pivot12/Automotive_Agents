@@ -558,83 +558,66 @@ def main():
     st.subheader("How This AI Agent Works")
     # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
-       # Mermaid diagram code
+       # Much simpler Mermaid diagram code compatible with v10.2.4
        mermaid_diagram = """
-       flowchart TD
-           A[User Interface] --> B[Query Input]
-           A --> C[Market Selection]
-           B --> D[Process Query Button]
-           C --> D
-           D --> E[Initialize Agent]
-           E --> F{Use LangGraph?}
-           F -->|Yes| G[LangGraph Implementation]
-           F -->|No| H[Simplified Agent]
-           G --> I[START]
-           I --> J[get_market Node]
-           J --> K{Market Identified?}
-           K -->|Yes| L[select_url Node]
-           K -->|No| J
-           L --> M[extract_pdf_links Node]
-           M --> N[download_and_process_pdfs Node]
-           N --> O[analyze_content Node]
-           O --> P[END]
-           H --> Q[Determine Market]
-           Q --> R[Select URL]
-           R --> S[Extract PDF Links]
-           S --> T[Download/Process PDFs]
-           T --> U[Analyze Content]
-           V[Groq API] <--> J
-           V <--> M
-           V <--> O
-           V <--> Q
-           V <--> S
-           V <--> U
-           P --> W[Display Results]
-           U --> W
-           N --> AA[PDF Processing]
-           T --> AA
-           AA --> O
-           AA --> U
-           G -.-> AD[Error Handling]
-           H -.-> AD
-           classDef userInterface fill:#d0f0c0,stroke:#333,stroke-width:1px
-           classDef llm fill:#f9d6c5,stroke:#333,stroke-width:1px
-           classDef process fill:#c5daf9,stroke:#333,stroke-width:1px
-           classDef results fill:#f9f0c5,stroke:#333,stroke-width:1px
-           classDef error fill:#f9c5c5,stroke:#333,stroke-width:1px
-           class A,B,C,D userInterface
-           class V llm
-           class E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U process
-           class W results
-           class AD error
+       flowchart TB
+           UI[User Interface] --> Query[Query Input]
+           UI --> Market[Market Selection]
+           Query --> Process[Process Query]
+           Market --> Process
+           Process --> Agent[Initialize Agent]
+           Agent --> Pipeline[Processing Pipeline]
+           Pipeline --> Documents[Document Analysis]
+           Documents --> Answer[Generate Answer]
+           LLM[Groq LLM API] -.-> Pipeline
+           LLM -.-> Documents
+           LLM -.-> Answer
+           Documents --> PDFs[PDF Processing]
+           ErrorHandling[Error Handling] -.-> Pipeline
+           ErrorHandling -.-> Documents
+           classDef interface fill:#d0f0c0
+           classDef api fill:#f9d6c5
+           classDef process fill:#c5daf9
+           classDef error fill:#f9c5c5
+           class UI,Query,Market interface
+           class LLM api
+           class Agent,Pipeline,Documents,Answer,PDFs process
+           class ErrorHandling error
        """
-       # Render the diagram using streamlit-mermaid
        try:
-           st_mermaid(mermaid_diagram, height=600)
-           st.success("Diagram rendered successfully!")
+           # Use streamlit-mermaid with explicit height and width
+           st_mermaid(mermaid_diagram, height=500, width=None)
        except Exception as e:
            st.error(f"Error rendering diagram: {str(e)}")
-           # Fallback to HTML rendering if streamlit-mermaid fails
-           st.warning("Falling back to HTML rendering method")
-           html_code = f"""
-<div class="mermaid">
-           {mermaid_diagram}
-</div>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10.0.0/dist/mermaid.min.js"></script>
-<script>
-               mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
-</script>
+           # Ultra-simple fallback diagram if even the simplified one fails
+           ultra_simple_diagram = """
+           flowchart TB
+               A[User Input] --> B[Process Query]
+               B --> C[Find Documents]
+               C --> D[Generate Answer]
+               E[Groq LLM] -.-> B
+               E -.-> C
+               E -.-> D
            """
-           st.components.v1.html(html_code, height=600)
+           st.warning("Using ultra-simple diagram due to rendering issues")
+           try:
+               st_mermaid(ultra_simple_diagram, height=300)
+           except:
+               # Text-only fallback
+               st.code("""
+               User Input → Process Query → Find Documents → Generate Answer
+                               ↑               ↑               ↑
+                              Groq LLM API connections
+               """)
        # Explanation of the diagram
        st.markdown("""
        ### Diagram Explanation
-       This diagram shows the flow of information in the Automotive Regulatory Document Assistant:
-       1. **User Interface**: Where you enter your query and select a market
-       2. **Processing Pipeline**: The agent processes your request using LLM technology
-       3. **Document Analysis**: Relevant regulatory documents are analyzed
-       4. **Answer Generation**: A comprehensive response is created based on document analysis
-        """)
+       This diagram shows how the Automotive Regulatory Document Assistant works:
+       1. **User Interface**: You enter your query and select a market
+       2. **Processing Pipeline**: The system analyzes your request
+       3. **Document Analysis**: Relevant documents are found and processed
+       4. **Answer Generation**: A comprehensive answer is created
+       """)
     # Add some usage instructions
     st.markdown("---")
     st.markdown("""
