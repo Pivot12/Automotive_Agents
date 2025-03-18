@@ -6,6 +6,7 @@ import io
 import PyPDF2
 import streamlit as st
 import pandas as pd
+from streamlit_mermaid import st_mermaid
 from groq import Groq
 from bs4 import BeautifulSoup
 from typing import Dict, List, Any, Tuple
@@ -555,9 +556,9 @@ def main():
     # The architecture diagram
     st.markdown("---")
     st.subheader("How This Application Works")
-   # Create a collapsible section for the diagram
+    # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
-       # Mermaid diagram code - simplified to avoid syntax errors
+       # Mermaid diagram code
        mermaid_diagram = """
        flowchart TD
            A[User Interface] --> B[Query Input]
@@ -607,21 +608,24 @@ def main():
            class W results
            class AD error
        """
-       # Use streamlit-mermaid for more reliable rendering
-       st.markdown("### Install streamlit-mermaid for better diagram viewing:")
-       st.code("pip install streamlit-mermaid", language="bash")
-       # Fallback to simpler HTML rendering
-       html_code = f"""
+       # Render the diagram using streamlit-mermaid
+        try:
+           st_mermaid(mermaid_diagram, height=600)
+           st.success("Diagram rendered successfully!")
+        except Exception as e:
+           st.error(f"Error rendering diagram: {str(e)}")
+           # Fallback to HTML rendering if streamlit-mermaid fails
+           st.warning("Falling back to HTML rendering method")
+           html_code = f"""
 <div class="mermaid">
-       {mermaid_diagram}
+           {mermaid_diagram}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.0.0/dist/mermaid.min.js"></script>
 <script>
-           mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
+               mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
 </script>
-       """
-       # Render the HTML using Streamlit's components.html
-       st.components.v1.html(html_code, height=600)
+           """
+           st.components.v1.html(html_code, height=600)
        # Explanation of the diagram
        st.markdown("""
        ### Diagram Explanation
@@ -630,17 +634,7 @@ def main():
        2. **Processing Pipeline**: The agent processes your request using LLM technology
        3. **Document Analysis**: Relevant regulatory documents are analyzed
        4. **Answer Generation**: A comprehensive response is created based on document analysis
-       
-       """)
-       # Add a simple text diagram as fallback
-       st.markdown("""
-       #### Text-based diagram (if the graphical diagram doesn't load properly):
-       ```
-       User Input → Market Determination → URL Selection → PDF Extraction → Document Analysis → Final Answer
-                                                                ↓
-                                              Error Handling and Logging
-       ```
-       """)
+
     # Add some usage instructions
     st.markdown("---")
     st.markdown("""
