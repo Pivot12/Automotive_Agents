@@ -552,236 +552,95 @@ def main():
         else:
             st.warning("Please enter a query.")
     
-    # the architecture diagram
-
-    st.markdown("---")
-
-    st.subheader("How This Application Works")
-
-    # Create a collapsible section for the diagram
-
-    with st.expander("Click to view the application architecture diagram"):
-
-        # Mermaid diagram code
-
-        mermaid_diagram = """
-
-        flowchart TD
-
-            subgraph User_Interface
-
-                A[User Interface] --> B[Query Input]
-
-                A --> C[Market Selection]
-
-                B --> D[Process Query Button]
-
-                C --> D
-
-            end
-
-            subgraph Processing_Pipeline
-
-                D --> E[Initialize Agent]
-
-                E --> F{Use LangGraph?}
-
-                F -->|Yes| G[LangGraph Implementation]
-
-                F -->|No| H[Simplified Agent]
-
-                subgraph LangGraph_Flow
-
-                    G --> I[START]
-
-                    I --> J[get_market Node]
-
-                    J --> K{Market Identified?}
-
-                    K -->|Yes| L[select_url Node]
-
-                    K -->|No| J
-
-                    L --> M[extract_pdf_links Node]
-
-                    M --> N[download_and_process_pdfs Node]
-
-                    N --> O[analyze_content Node]
-
-                    O --> P[END]
-
-                end
-
-                subgraph Simplified_Flow
-
-                    H --> Q[Determine Market]
-
-                    Q --> R[Select URL]
-
-                    R --> S[Extract PDF Links]
-
-                    S --> T[Download/Process PDFs]
-
-                    T --> U[Analyze Content]
-
-                end
-
-            end
-
-            subgraph LLM_Integration
-
-                V[Groq API] <--> J
-
-                V <--> M
-
-                V <--> O
-
-                V <--> Q
-
-                V <--> S
-
-                V <--> U
-
-            end
-
-            subgraph Results_Display
-
-                W[Display Market]
-
-                X[Display Selected Website]
-
-                Y[Display Analyzed Documents]
-
-                Z[Display Final Answer]
-
-            end
-
-            P --> W
-
-            U --> W
-
-            W --> X --> Y --> Z
-
-            subgraph PDF_Processing
-
-                AA[PDF Extraction] --> AB[Text Chunking]
-
-                AB --> AC[Content Analysis]
-
-            end
-
-            N --> AA
-
-            T --> AA
-
-            AC --> O
-
-            AC --> U
-
-            subgraph Error_Handling
-
-                AD[Logging System]
-
-                AE[UI Error Display]
-
-                AF[Fallback Content]
-
-            end
-
-            G -.-> AD
-
-            H -.-> AD
-
-            AD -.-> AE
-
-            M -.-> AF
-
-            S -.-> AF
-
-            classDef userInterface fill:#d0f0c0,stroke:#333,stroke-width:1px
-
-            classDef llm fill:#f9d6c5,stroke:#333,stroke-width:1px
-
-            classDef process fill:#c5daf9,stroke:#333,stroke-width:1px
-
-            classDef results fill:#f9f0c5,stroke:#333,stroke-width:1px
-
-            classDef error fill:#f9c5c5,stroke:#333,stroke-width:1px
-
-            class A,B,C,D userInterface
-
-            class V llm
-
-            class E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U process
-
-            class W,X,Y,Z results
-
-            class AD,AE,AF error
-
-        """
-
-        # Generate HTML with Mermaid diagram
-
-        html_code = f"""
+    # The architecture diagram
+   st.markdown("---")
+   st.subheader("How This Application Works")
+   # Create a collapsible section for the diagram
+   with st.expander("Click to view the application architecture diagram"):
+       # Mermaid diagram code - simplified to avoid syntax errors
+       mermaid_diagram = """
+       flowchart TD
+           A[User Interface] --> B[Query Input]
+           A --> C[Market Selection]
+           B --> D[Process Query Button]
+           C --> D
+           D --> E[Initialize Agent]
+           E --> F{Use LangGraph?}
+           F -->|Yes| G[LangGraph Implementation]
+           F -->|No| H[Simplified Agent]
+           G --> I[START]
+           I --> J[get_market Node]
+           J --> K{Market Identified?}
+           K -->|Yes| L[select_url Node]
+           K -->|No| J
+           L --> M[extract_pdf_links Node]
+           M --> N[download_and_process_pdfs Node]
+           N --> O[analyze_content Node]
+           O --> P[END]
+           H --> Q[Determine Market]
+           Q --> R[Select URL]
+           R --> S[Extract PDF Links]
+           S --> T[Download/Process PDFs]
+           T --> U[Analyze Content]
+           V[Groq API] <--> J
+           V <--> M
+           V <--> O
+           V <--> Q
+           V <--> S
+           V <--> U
+           P --> W[Display Results]
+           U --> W
+           N --> AA[PDF Processing]
+           T --> AA
+           AA --> O
+           AA --> U
+           G -.-> AD[Error Handling]
+           H -.-> AD
+           classDef userInterface fill:#d0f0c0,stroke:#333,stroke-width:1px
+           classDef llm fill:#f9d6c5,stroke:#333,stroke-width:1px
+           classDef process fill:#c5daf9,stroke:#333,stroke-width:1px
+           classDef results fill:#f9f0c5,stroke:#333,stroke-width:1px
+           classDef error fill:#f9c5c5,stroke:#333,stroke-width:1px
+           class A,B,C,D userInterface
+           class V llm
+           class E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U process
+           class W results
+           class AD error
+       """
+       # Use streamlit-mermaid for more reliable rendering
+       st.markdown("### Install streamlit-mermaid for better diagram viewing:")
+       st.code("pip install streamlit-mermaid", language="bash")
+       # Fallback to simpler HTML rendering
+       html_code = f"""
 <div class="mermaid">
-
-        {mermaid_diagram}
+       {mermaid_diagram}
 </div>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.0.0/dist/mermaid.min.js"></script>
 <script>
-
-            mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
+           mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
 </script>
-
-        """
-
-        # Render the HTML using Streamlit's components.html
-
-        st.components.v1.html(html_code, height=600)
-
-        # Explanation of the diagram
-
-        st.markdown("""
-
-        ### Diagram Explanation
-
-        This diagram shows the flow of information in the Automotive Regulatory Document Assistant:
-
-        1. **User Interface**: Where you enter your query and select a market
-
-        2. **Processing Pipeline**: The agent processes your request using LLM technology
-
-        3. **Document Analysis**: Relevant regulatory documents are analyzed
-
-        4. **Answer Generation**: A comprehensive response is created based on document analysis
-
-        The system uses the Groq API with the llama-3.3-70b-versatile model for intelligent processing at each step.
-
-        """)
-
-
-    # Add a button to view the diagram in a new tab
-
-    if st.button("Open Diagram in New Tab"):
-
-        # Create a dedicated page URL
-
-        diagram_url = "https://mermaid.live/view#" + mermaid_diagram
-
-        # Use JavaScript to open a new tab
-
-        st.markdown(f"""
-<script>
-
-            window.open('{diagram_url}', '_blank').focus();
-</script>
-
-        """, unsafe_allow_html=True)
-
-        # Fallback for when JavaScript is disabled
-
-        st.markdown(f"[Open Diagram in Mermaid Live Editor]({diagram_url})")
-
+       """
+       # Render the HTML using Streamlit's components.html
+       st.components.v1.html(html_code, height=600)
+       # Explanation of the diagram
+       st.markdown("""
+       ### Diagram Explanation
+       This diagram shows the flow of information in the Automotive Regulatory Document Assistant:
+       1. **User Interface**: Where you enter your query and select a market
+       2. **Processing Pipeline**: The agent processes your request using LLM technology
+       3. **Document Analysis**: Relevant regulatory documents are analyzed
+       4. **Answer Generation**: A comprehensive response is created based on document analysis
+       
+       """)
+       # Add a simple text diagram as fallback
+       st.markdown("""
+       #### Text-based diagram (if the graphical diagram doesn't load properly):
+       ```
+       User Input → Market Determination → URL Selection → PDF Extraction → Document Analysis → Final Answer
+                                                                ↓
+                                              Error Handling and Logging
+       ```
+       """)
     # Add some usage instructions
     st.markdown("---")
     st.markdown("""
