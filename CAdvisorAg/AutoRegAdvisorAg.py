@@ -559,7 +559,7 @@ def main():
     1. Enter your query about automotive regulations
     2. Either select a specific market or let the system detect it
     3. Click "Process Query" to start the analysis
-    4. The system will identify relevant documents and provide an answer based on their content
+    4. The system will identify relevant documents from all global regulatory databases and provide an accurate answer based on their content only
     
     ## Example queries
     - "What are the crash test requirements for passenger vehicles in the US?"
