@@ -609,10 +609,10 @@ def main():
            class AD error
        """
        # Render the diagram using streamlit-mermaid
-        try:
+       try:
            st_mermaid(mermaid_diagram, height=600)
            st.success("Diagram rendered successfully!")
-        except Exception as e:
+       except Exception as e:
            st.error(f"Error rendering diagram: {str(e)}")
            # Fallback to HTML rendering if streamlit-mermaid fails
            st.warning("Falling back to HTML rendering method")
