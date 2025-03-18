@@ -634,7 +634,7 @@ def main():
        2. **Processing Pipeline**: The agent processes your request using LLM technology
        3. **Document Analysis**: Relevant regulatory documents are analyzed
        4. **Answer Generation**: A comprehensive response is created based on document analysis
-
+        """)
     # Add some usage instructions
     st.markdown("---")
     st.markdown("""
