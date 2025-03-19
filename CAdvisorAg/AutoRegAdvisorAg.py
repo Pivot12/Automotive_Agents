@@ -664,7 +664,7 @@ def main():
                   # Create the diagram
                   diagram_image = create_diagram_image()
                   # Display the image
-                  st.image(diagram_image, caption="Application Architecture", use_column_width=True)
+                  st.image(diagram_image, caption="Application Architecture", use_container_width=True)
                   # Add download option
                   img_str = get_image_base64(diagram_image)
                   href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
