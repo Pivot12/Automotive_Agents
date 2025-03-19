@@ -11,3 +11,4 @@ streamlit-mermaid
 pillow
 matplotlib
 networkx
+pybase64
