@@ -684,8 +684,8 @@ def main():
             class ErrorHandling error
         """
         
-        # Direct rendering without success message that might confuse users
-        streamlit_mermaid.st_mermaid(mermaid_diagram, height=500)
+           # Direct rendering without success message that might confuse users
+           streamlit_mermaid.st_mermaid(mermaid_diagram, height=500)
         
        except (ImportError, Exception) as e:
            st.warning(f"Could not load Mermaid diagram: {type(e).__name__}")
