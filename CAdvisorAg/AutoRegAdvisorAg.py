@@ -676,15 +676,15 @@ def main():
                                                                                             ↓
                                                                                      PDF Processing
                   """)  
-       # Explanation of the diagram
-       st.markdown("""
+    # Explanation of the diagram
+    st.markdown("""
        ### Diagram Explanation
        This diagram shows how the Automotive Regulatory Document Assistant works:
        1. **User Interface**: You enter your query and select a market
        2. **Processing Pipeline**: The system analyzes your request
        3. **Document Analysis**: Relevant documents are found and processed
        4. **Answer Generation**: A comprehensive answer is created
-       """)
+       """)      
        
     # Add some usage instructions
     st.markdown("---")
