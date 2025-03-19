@@ -8,6 +8,7 @@ langgraph
 langchain
 langchain-groq
 streamlit-mermaid
+streamlit_mermaid
 pillow
 matplotlib
 networkx
