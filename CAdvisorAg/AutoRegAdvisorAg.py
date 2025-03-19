@@ -677,7 +677,7 @@ def main():
                                                                                      PDF Processing
                   """)  
     # Explanation of the diagram
-    st.markdown("""
+       st.markdown("""
        ### Diagram Explanation
        This diagram shows how the Automotive Regulatory Document Assistant works:
        1. **User Interface**: You enter your query and select a market
