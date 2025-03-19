@@ -1,6 +1,7 @@
 # pip install streamlit requests PyPDF2 beautifulsoup4 pandas groq langgraph langchain-groq
 import os
 import re
+import base64
 import requests
 import io
 import PyPDF2
@@ -14,6 +15,99 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langgraph.graph import END, StateGraph, START
 import logging
 from pydantic import BaseModel, Field
+from PIL import Image
+from io import BytesIO
+import matplotlib.pyplot as plt
+import networkx as nx
+
+# Diagram Image Creation
+def create_diagram_image():
+   """Create a diagram image using NetworkX and Matplotlib"""
+   # Create a graph
+   G = nx.DiGraph()
+   # Add nodes with positions for a more controlled layout
+   nodes = {
+       "User Input": {"pos": (0, 0)},
+       "Market Selection": {"pos": (0, -1)},
+       "Process Query": {"pos": (1, -0.5)},
+       "Initialize Agent": {"pos": (2, -0.5)},
+       "Processing Pipeline": {"pos": (3, -0.5)},
+       "Document Analysis": {"pos": (4, -0.5)},
+       "Generate Answer": {"pos": (5, -0.5)},
+       "Groq LLM API": {"pos": (3, -2)},
+       "PDF Processing": {"pos": (4, -1.5)},
+       "Error Handling": {"pos": (2, -2)}
+   }
+   # Add all nodes
+   for node, attrs in nodes.items():
+       G.add_node(node, **attrs)
+   # Define node colors by category
+   node_colors = {
+       "User Input": "#d0f0c0",
+       "Market Selection": "#d0f0c0",
+       "Process Query": "#d0f0c0",
+       "Initialize Agent": "#c5daf9",
+       "Processing Pipeline": "#c5daf9",
+       "Document Analysis": "#c5daf9",
+       "Generate Answer": "#c5daf9",
+       "Groq LLM API": "#f9d6c5",
+       "PDF Processing": "#c5daf9",
+       "Error Handling": "#f9c5c5"
+   }
+   # Add edges (connections)
+   edges = [
+       ("User Input", "Process Query"),
+       ("Market Selection", "Process Query"),
+       ("Process Query", "Initialize Agent"),
+       ("Initialize Agent", "Processing Pipeline"),
+       ("Processing Pipeline", "Document Analysis"),
+       ("Document Analysis", "Generate Answer"),
+       ("Groq LLM API", "Processing Pipeline"),
+       ("Groq LLM API", "Document Analysis"),
+       ("Groq LLM API", "Generate Answer"),
+       ("Document Analysis", "PDF Processing"),
+       ("Error Handling", "Processing Pipeline"),
+       ("Error Handling", "Document Analysis")
+   ]
+   G.add_edges_from(edges)
+   # Create figure with a white background
+   plt.figure(figsize=(10, 6), facecolor='white')
+   # Get node positions
+   pos = nx.get_node_attributes(G, 'pos')
+   # Draw nodes with custom colors
+   for node, color in node_colors.items():
+       nx.draw_networkx_nodes(G, pos, nodelist=[node], node_color=color,
+                             node_size=2500, edgecolors='black')
+   # Draw regular edges (solid lines)
+   regular_edges = [(u, v) for u, v in edges if u not in ["Groq LLM API", "Error Handling"]]
+   nx.draw_networkx_edges(G, pos, edgelist=regular_edges, arrows=True, arrowsize=20,
+                         width=1.5, edge_color='black')
+   # Draw special edges (dashed lines)
+   special_edges = [(u, v) for u, v in edges if u in ["Groq LLM API", "Error Handling"]]
+   nx.draw_networkx_edges(G, pos, edgelist=special_edges, arrows=True, arrowsize=20,
+                         width=1.5, edge_color='gray', style='dashed')
+   # Add labels with white background for better readability
+   label_options = {"fc": "white", "alpha": 0.8, "bbox": {"pad": 5, "boxstyle": "round"}}
+   nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold', bbox=label_options)
+   # Remove axes
+   plt.axis('off')
+   plt.tight_layout()
+   # Save the plot to a BytesIO object
+   buffer = BytesIO()
+   plt.savefig(buffer, format='png', dpi=120, bbox_inches='tight')
+   buffer.seek(0)
+   plt.close()
+   # Create image from buffer
+   image = Image.open(buffer)
+   return image
+# Function to get base64 encoded image for embedded display
+def get_image_base64(image):
+   buffered = BytesIO()
+   image.save(buffered, format="PNG")
+   img_str = base64.b64encode(buffered.getvalue()).decode()
+   return img_str
+
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -555,60 +649,73 @@ def main():
     
     # The architecture diagram
     st.markdown("---")
-    st.subheader("How This AI Agent Works")
+    st.subheader("How This Application Works")
     # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
-       # Much simpler Mermaid diagram code compatible with v10.2.4
-       mermaid_diagram = """
-       flowchart TB
-           UI[User Interface] --> Query[Query Input]
-           UI --> Market[Market Selection]
-           Query --> Process[Process Query]
-           Market --> Process
-           Process --> Agent[Initialize Agent]
-           Agent --> Pipeline[Processing Pipeline]
-           Pipeline --> Documents[Document Analysis]
-           Documents --> Answer[Generate Answer]
-           LLM[Groq LLM API] -.-> Pipeline
-           LLM -.-> Documents
-           LLM -.-> Answer
-           Documents --> PDFs[PDF Processing]
-           ErrorHandling[Error Handling] -.-> Pipeline
-           ErrorHandling -.-> Documents
-           classDef interface fill:#d0f0c0
-           classDef api fill:#f9d6c5
-           classDef process fill:#c5daf9
-           classDef error fill:#f9c5c5
-           class UI,Query,Market interface
-           class LLM api
-           class Agent,Pipeline,Documents,Answer,PDFs process
-           class ErrorHandling error
-       """
+       # First try streamlit-mermaid if available
        try:
-           # Use streamlit-mermaid with explicit height and width
-           st_mermaid(mermaid_diagram, height=500, width=None)
-       except Exception as e:
-           st.error(f"Error rendering diagram: {str(e)}")
-           # Ultra-simple fallback diagram if even the simplified one fails
-           ultra_simple_diagram = """
+           from streamlit_mermaid import st_mermaid
+           # Simple Mermaid diagram code compatible with v10.2.4
+           mermaid_diagram = """
            flowchart TB
-               A[User Input] --> B[Process Query]
-               B --> C[Find Documents]
-               C --> D[Generate Answer]
-               E[Groq LLM] -.-> B
-               E -.-> C
-               E -.-> D
+               UI[User Interface] --> Query[Query Input]
+               UI --> Market[Market Selection]
+               Query --> Process[Process Query]
+               Market --> Process
+               Process --> Agent[Initialize Agent]
+               Agent --> Pipeline[Processing Pipeline]
+               Pipeline --> Documents[Document Analysis]
+               Documents --> Answer[Generate Answer]
+               LLM[Groq LLM API] -.-> Pipeline
+               LLM -.-> Documents
+               LLM -.-> Answer
+               Documents --> PDFs[PDF Processing]
+               ErrorHandling[Error Handling] -.-> Pipeline
+               ErrorHandling -.-> Documents
+               classDef interface fill:#d0f0c0
+               classDef api fill:#f9d6c5
+               classDef process fill:#c5daf9
+               classDef error fill:#f9c5c5
+               class UI,Query,Market interface
+               class LLM api
+               class Agent,Pipeline,Documents,Answer,PDFs process
+               class ErrorHandling error
            """
-           st.warning("Using ultra-simple diagram due to rendering issues")
-           try:
-               st_mermaid(ultra_simple_diagram, height=300)
-           except:
-               # Text-only fallback
-               st.code("""
-               User Input → Process Query → Find Documents → Generate Answer
-                               ↑               ↑               ↑
-                              Groq LLM API connections
-               """)
+           with st.spinner("Loading diagram..."):
+               mermaid_container = st.empty()
+               mermaid_container.info("Loading Mermaid diagram...")
+               try:
+                   st_mermaid(mermaid_diagram, height=500)
+                   mermaid_container.empty()  # Remove the loading message
+                   st.success("Mermaid diagram loaded successfully")
+               except Exception as e:
+                   mermaid_container.warning(f"Could not load Mermaid diagram: {str(e)}")
+                   raise e  # Re-raise to fall back to image
+       except (ImportError, Exception) as e:
+           st.warning(f"Falling back to static diagram image due to: {type(e).__name__}")
+           # Generate diagram image
+           with st.spinner("Generating diagram image..."):
+               try:
+                   # Create the diagram
+                   diagram_image = create_diagram_image()
+                   # Display the image
+                   st.image(diagram_image, caption="Application Architecture", use_column_width=True)
+                   # Add download option
+                   img_str = get_image_base64(diagram_image)
+                   href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
+                   st.markdown(href, unsafe_allow_html=True)
+               except Exception as img_error:
+                   st.error(f"Error generating diagram image: {str(img_error)}")
+                   # Text-only fallback as last resort
+                   st.code("""
+                   User Input → Process Query → Initialize Agent → Processing Pipeline → Document Analysis → Generate Answer
+                                                                       ↑                       ↑                  ↑
+                                                                  Groq LLM API connections (provides intelligence)
+                                                                       ↑                       ↑
+                                                                 Error Handling (monitors process)
+                                                                                               ↓
+                                                                                       PDF Processing
+                   """)
        # Explanation of the diagram
        st.markdown("""
        ### Diagram Explanation
@@ -618,6 +725,7 @@ def main():
        3. **Document Analysis**: Relevant documents are found and processed
        4. **Answer Generation**: A comprehensive answer is created
        """)
+       
     # Add some usage instructions
     st.markdown("---")
     st.markdown("""
