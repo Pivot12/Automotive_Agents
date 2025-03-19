@@ -648,72 +648,34 @@ def main():
             st.warning("Please enter a query.")
     
     # The architecture diagram
-    st.markdown("---")
-    st.subheader("How This Application Works")
-    # Create a collapsible section for the diagram
-    with st.expander("Click to view the application architecture diagram"):
-       # Try streamlit-mermaid if available
-       try:
-           # Import the module at the beginning of the function to ensure it's available
-           import streamlit_mermaid
-        
-            # Simple Mermaid diagram code compatible with streamlit-mermaid
-           mermaid_diagram = """
-            flowchart TB
-            UI[User Interface] --> Query[Query Input]
-            UI --> Market[Market Selection]
-            Query --> Process[Process Query]
-            Market --> Process
-            Process --> Agent[Initialize Agent]
-            Agent --> Pipeline[Processing Pipeline]
-            Pipeline --> Documents[Document Analysis]
-            Documents --> Answer[Generate Answer]
-            LLM[Groq LLM API] -.-> Pipeline
-            LLM -.-> Documents
-            LLM -.-> Answer
-            Documents --> PDFs[PDF Processing]
-            ErrorHandling[Error Handling] -.-> Pipeline
-            ErrorHandling -.-> Documents
-            classDef interface fill:#d0f0c0
-            classDef api fill:#f9d6c5
-            classDef process fill:#c5daf9
-            classDef error fill:#f9c5c5
-            class UI,Query,Market interface
-            class LLM api
-            class Agent,Pipeline,Documents,Answer,PDFs process
-            class ErrorHandling error
-        """
-        
-           # Direct rendering without success message that might confuse users
-           streamlit_mermaid.st_mermaid(mermaid_diagram, height=500)
-        
-       except (ImportError, Exception) as e:
-           st.warning(f"Could not load Mermaid diagram: {type(e).__name__}")
-           st.write("Falling back to static diagram image.")
-        
-           # Generate diagram image
-           with st.spinner("Generating diagram image..."):
-               try:
-                # Create the diagram
-                diagram_image = create_diagram_image()
-                # Display the image
-                st.image(diagram_image, caption="Application Architecture", use_column_width=True)
-                # Add download option
-                img_str = get_image_base64(diagram_image)
-                href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
-                st.markdown(href, unsafe_allow_html=True)
-               except Exception as img_error:
-                st.error(f"Error generating diagram image: {str(img_error)}")
-                # Text-only fallback as last resort
-                st.code("""
-                User Input → Process Query → Initialize Agent → Processing Pipeline → Document Analysis → Generate Answer
-                                                                    ↑                      ↑                 ↑
-                                                               Groq LLM API connections (provides intelligence)
-                                                                    ↑                      ↑
-                                                              Error Handling (monitors process)
-                                                                                           ↓
-                                                                                    PDF Processing
-                """)
+      st.markdown("---")
+      st.subheader("How This Application Works")
+      
+      # Create a collapsible section for the diagram
+      with st.expander("Click to view the application architecture diagram"):
+          # Skip trying to use Mermaid and directly use the image-based approach
+          with st.spinner("Generating diagram image..."):
+              try:
+                  # Create the diagram
+                  diagram_image = create_diagram_image()
+                  # Display the image
+                  st.image(diagram_image, caption="Application Architecture", use_column_width=True)
+                  # Add download option
+                  img_str = get_image_base64(diagram_image)
+                  href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
+                  st.markdown(href, unsafe_allow_html=True)
+              except Exception as img_error:
+                  st.error(f"Error generating diagram image: {str(img_error)}")
+                  # Text-only fallback as last resort
+                  st.code("""
+                  User Input → Process Query → Initialize Agent → Processing Pipeline → Document Analysis → Generate Answer
+                                                                      ↑                      ↑                 ↑
+                                                                Groq LLM API connections (provides intelligence)
+                                                                      ↑                      ↑
+                                                                Error Handling (monitors process)
+                                                                                            ↓
+                                                                                     PDF Processing
+                  """)
        # Explanation of the diagram
        st.markdown("""
        ### Diagram Explanation
