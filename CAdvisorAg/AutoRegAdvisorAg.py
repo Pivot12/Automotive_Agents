@@ -648,13 +648,13 @@ def main():
             st.warning("Please enter a query.")
     
     # The architecture diagram
-      st.markdown("---")
-      st.subheader("How This Application Works")
+    st.markdown("---")
+    st.subheader("How This Application Works")
       
-      # Create a collapsible section for the diagram
-      with st.expander("Click to view the application architecture diagram"):
+    # Create a collapsible section for the diagram
+    with st.expander("Click to view the application architecture diagram"):
           # Skip trying to use Mermaid and directly use the image-based approach
-          with st.spinner("Generating diagram image..."):
+         with st.spinner("Generating diagram image..."):
               try:
                   # Create the diagram
                   diagram_image = create_diagram_image()
@@ -675,7 +675,7 @@ def main():
                                                                 Error Handling (monitors process)
                                                                                             ↓
                                                                                      PDF Processing
-                  """)
+                  """)  
        # Explanation of the diagram
        st.markdown("""
        ### Diagram Explanation
