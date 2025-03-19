@@ -86,9 +86,12 @@ def create_diagram_image():
    special_edges = [(u, v) for u, v in edges if u in ["Groq LLM API", "Error Handling"]]
    nx.draw_networkx_edges(G, pos, edgelist=special_edges, arrows=True, arrowsize=20,
                          width=1.5, edge_color='gray', style='dashed')
-   # Add labels with white background for better readability
-   label_options = {"fc": "white", "alpha": 0.8, "bbox": {"pad": 5, "boxstyle": "round"}}
-   nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold', bbox=label_options)
+   
+   # Fix: Update the labels section that was causing the error
+   # Draw node labels with a different approach
+   # Instead of using bbox parameter, use backgroundcolor and padding
+   nx.draw_networkx_labels(G, pos, font_size=10, font_weight='bold')
+   
    # Remove axes
    plt.axis('off')
    plt.tight_layout()
@@ -100,6 +103,8 @@ def create_diagram_image():
    # Create image from buffer
    image = Image.open(buffer)
    return image
+
+
 # Function to get base64 encoded image for embedded display
 def get_image_base64(image):
    buffered = BytesIO()
