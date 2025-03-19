@@ -26,7 +26,7 @@ def create_diagram_image():
     # Create a graph
     G = nx.DiGraph()
     
-    # Improved node positions for better spacing and no overlaps
+    # Node positions for better spacing and no overlaps
     nodes = {
         "User Input": {"pos": (0, 2)},
         "Market Selection": {"pos": (0, 0)},
@@ -58,7 +58,7 @@ def create_diagram_image():
         "Error Handling": "#f9b0b0"        # Deeper red
     }
     
-    # Add edges (connections)
+    # Edges
     edges = [
         ("User Input", "Process Query"),
         ("Market Selection", "Process Query"),
@@ -69,7 +69,7 @@ def create_diagram_image():
         ("Document Analysis", "PDF Processing"),
     ]
     
-    # Special edges with custom routing to avoid label overlaps
+    # Special edges to avoid label overlaps
     special_edges = [
         ("Groq LLM API", "Processing Pipeline"),
         ("Groq LLM API", "Document Analysis"),
@@ -81,13 +81,13 @@ def create_diagram_image():
     G.add_edges_from(edges)
     G.add_edges_from(special_edges)
     
-    # Create figure with a white background
+    # Figure with a white background
     plt.figure(figsize=(12, 7), facecolor='white')
     
     # Get node positions
     pos = nx.get_node_attributes(G, 'pos')
     
-    # Draw nodes with custom colors, larger size and thicker borders
+    # Draw Nodes
     for node, color in node_colors.items():
         nx.draw_networkx_nodes(G, pos, nodelist=[node], node_color=color,
                                node_size=3000, edgecolors='black', linewidths=2)
@@ -110,7 +110,7 @@ def create_diagram_image():
                               width=2, edge_color=style['color'], style=style['style'],
                               connectionstyle=f'arc3,rad={style["rad"]}')
     
-    # Draw node labels with improved visibility
+    # Draw node labels
     text_items = {}
     for node, (x, y) in pos.items():
         text_items[node] = plt.text(x, y, node,
@@ -169,7 +169,7 @@ logger = logging.getLogger(__name__)
 os.environ["GROQ_API_KEY"] = "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"
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
-# Updated automotive regulatory websites
+# Automotive regulatory websites
 REGULATORY_WEBSITES = {
     "US": "https://www.nhtsa.gov/laws-regulations/fmvss",
     "EU": "https://unece.org/transport/vehicle-regulations",
@@ -738,7 +738,7 @@ def main():
     4. **Answer Generation**: A comprehensive answer is created
     """)      
        
-    # Add some usage instructions
+    # Usage instructions
     st.markdown("---")
     st.markdown("""
     ## How to use this tool
