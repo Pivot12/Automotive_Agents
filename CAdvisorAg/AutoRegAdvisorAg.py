@@ -22,9 +22,6 @@ import networkx as nx
 
 
 
-    
-    
-
 # Diagram Image Creation
 def create_diagram_image():
     """Create a polished diagram image using NetworkX and Matplotlib"""
@@ -600,7 +597,7 @@ def create_simple_agent():
 
     return process_query
 
-# Streamlit UI
+# UI with dropdown
 def main():
     st.set_page_config(page_title="Automotive Regulations AI Agent", layout="wide")
     
@@ -713,67 +710,90 @@ def main():
         else:
             st.warning("Please enter a query.")
     
-   # The architecture diagram
+    # The architecture diagram section
     st.markdown("---")
     st.subheader("How This AI Agent Works")
       
     # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
-          # Skip trying to use Mermaid and directly use the image-based approach
-         with st.spinner("Generating diagram image..."):
-              try:
-                  # Create the diagram
-                  diagram_image = create_diagram_image()
-                  # Display the image
-                  st.image(diagram_image, caption="Application Architecture", use_container_width=True)
-                  # Add download option
-                  img_str = get_image_base64(diagram_image)
-                  href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
-                  st.markdown(href, unsafe_allow_html=True)
-              except Exception as img_error:
-                  st.error(f"Error generating diagram image: {str(img_error)}")
-                  # Text-only fallback as last resort
-                  st.code("""
-                  User Input → Process Query → Initialize Agent → Processing Pipeline → Document Retrieval → Document Analysis → Generate Answer
+        with st.spinner("Generating diagram image..."):
+            try:
+                # Create the diagram
+                diagram_image = create_diagram_image()
+                # Display the image
+                st.image(diagram_image, caption="Automotive Regulations AI Agent Architecture", use_column_width=True)
+                # Add download option
+                img_str = get_image_base64(diagram_image)
+                href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
+                st.markdown(href, unsafe_allow_html=True)
+            except Exception as img_error:
+                st.error(f"Error generating diagram image: {str(img_error)}")
+                # Text-only fallback as last resort
+                st.code("""
+                User Input → Process Query → Initialize Agent → Processing Pipeline → Document Retrieval → Document Analysis → Generate Answer
                                                                       ↑                      ↑                 ↑                   ↑
                                                                 Groq LLM API connections (provides intelligence)
                                                                       ↑                      ↑                 ↑
                                                                 Error Handling (monitors process)
                                                                                             ↓
                                                                                      PDF Processing
-                  """)  
-    # Enhanced explanation of the diagram
-    st.markdown("""
-   ### Diagram Explanation
-    This diagram shows the comprehensive architecture of the Automotive Regulatory Document Assistant:
+                """)
     
-    1. **User Interface Components**:
-       - User enters a query about automotive regulations
-       - Market selection allows focusing on specific regional rules (out of thousands of documents)
-    
-    2. **Core Processing Pipeline**:
-       - Query processing converts user input into structured formats
-       - Agent initialization sets up the regulatory search parameters
-       - Processing pipeline orchestrates the multiple steps needed for analysis
-    
-    3. **Data Collection Components**:
-       - Document retrieval locates relevant regulatory materials
-       - Web scraping extracts information from regulatory websites
-       - PDF processing handles documents in PDF format
-    
-    4. **Analysis Components**:
-       - Content chunking breaks down large documents for processing
-       - Document analysis extracts key regulatory information
-       - Market-specific rules apply regional regulations correctly
-    
-    5. **Response Generation**:
-       - Quality assurance ensures accuracy of information
-       - Answer generation provides comprehensive regulatory guidance
-    
-    6. **Support Systems**:
-       - Error handling monitors all processes for reliable execution
-       - Llama Gen-AI LLM provides the intelligence for all analysis
-    """)      
+    # Diagram explanation as a separate dropdown
+    with st.expander("Click to view detailed explanation of the architecture"):
+        st.markdown("""
+        ### Component Groups
+        
+        #### 1. User Interface Components
+        - **User Input**: Captures the user's regulatory query
+        - **Market Selection**: Allows selection of specific regulatory markets (US, EU, China, etc.)
+        - **Query Parameters**: Processes and structures the input for effective analysis
+        
+        #### 2. Core Processing Components
+        - **Process Query**: Analyzes and structures the user's request
+        - **Initialize Agent**: Sets up the workflow based on the query type
+        - **Processing Pipeline**: Orchestrates the sequence of operations
+        
+        #### 3. Data Collection Components
+        - **Document Retrieval**: Identifies relevant regulatory documents
+        - **Web Scraping**: Extracts information from regulatory websites
+        - **URL Processing**: Handles link extraction and validation
+        
+        #### 4. Document Processing Components
+        - **PDF Processing**: Extracts text from PDF documents
+        - **Text Extraction**: Converts document content to processable text
+        - **Document Analysis**: Identifies relevant regulatory information
+        - **Content Chunking**: Breaks down large documents for processing
+        
+        #### 5. Answer Generation Components
+        - **Generate Answer**: Creates comprehensive responses to queries
+        - **Quality Assurance**: Validates accuracy of regulatory information
+        - **Answer Formatting**: Structures responses for clarity
+        
+        #### 6. Support Systems
+        - **Llama GEN-AI LLM**: Provides AI capabilities across the system
+        - **Error Handling**: Monitors and resolves issues during processing
+        - **Market-Specific Rules**: Manages region-specific regulatory details
+        - **Regulatory Database**: Stores reference information on standards
+        
+        ### Process Flow
+        
+        1. The user submits a query about automotive regulations
+        2. The system determines the relevant market and regulatory domain
+        3. Relevant documents are identified and retrieved
+        4. Document content is extracted and analyzed
+        5. AI systems process the regulatory content to understand requirements
+        6. A comprehensive answer is generated based on authoritative sources
+        7. Quality checks ensure accuracy before presenting to the user
+        
+        ### Technical Implementation
+        
+        - Built using Python with Streamlit for the user interface
+        - Uses LLama 3.3 70B Versatile model for AI processing
+        - Implements web scraping for real-time regulatory information
+        - Document processing leverages PyPDF2 for text extraction
+        - Error handling throughout ensures reliable operation
+        """)
        
     # Usage instructions
     st.markdown("---")
