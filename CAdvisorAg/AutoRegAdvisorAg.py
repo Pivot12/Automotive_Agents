@@ -20,6 +20,11 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import networkx as nx
 
+
+
+    
+    
+
 # Diagram Image Creation
 def create_diagram_image():
     """Create a polished diagram image using NetworkX and Matplotlib"""
@@ -598,10 +603,19 @@ def create_simple_agent():
 # Streamlit UI
 def main():
     st.set_page_config(page_title="Automotive Regulations AI Agent", layout="wide")
-    st.title("Automotive Regulations AI Agent")
+    
+    # Header with contact information
+    col1, col2 = st.columns([5,1])
+    with col1:
+        st.title("Automotive Regulations AI Agent")
+    with col2:
+        st.markdown("<div style='text-align: right; padding-top: 10px;'><small style='color: gray;'>For any query contact:<br/>Neel Shah<br/>(neelshah.n0@gmail.com)</small></div>", unsafe_allow_html=True)
     
     # Sidebar for logs
     st.sidebar.title("Execution Logs")
+    # Add contact info to sidebar too
+    st.sidebar.markdown("<div style='text-align: center; padding-top: 10px; padding-bottom: 20px;'><small style='color: gray;'>For any query contact:<br/>Neel Shah (neelshah.n0@gmail.com)</small></div>", unsafe_allow_html=True)
+    
     log_placeholder = st.sidebar.empty()
     
     # Create a log handler that writes to the streamlit sidebar
@@ -699,9 +713,9 @@ def main():
         else:
             st.warning("Please enter a query.")
     
-    # The architecture diagram
+   # The architecture diagram
     st.markdown("---")
-    st.subheader("How This AI Agent Works (simplified)")
+    st.subheader("How This AI Agent Works")
       
     # Create a collapsible section for the diagram
     with st.expander("Click to view the application architecture diagram"):
@@ -720,22 +734,45 @@ def main():
                   st.error(f"Error generating diagram image: {str(img_error)}")
                   # Text-only fallback as last resort
                   st.code("""
-                  User Input → Process Query → Initialize Agent → Processing Pipeline → Document Analysis → Generate Answer
-                                                                      ↑                      ↑                 ↑
+                  User Input → Process Query → Initialize Agent → Processing Pipeline → Document Retrieval → Document Analysis → Generate Answer
+                                                                      ↑                      ↑                 ↑                   ↑
                                                                 Groq LLM API connections (provides intelligence)
-                                                                      ↑                      ↑
+                                                                      ↑                      ↑                 ↑
                                                                 Error Handling (monitors process)
                                                                                             ↓
                                                                                      PDF Processing
                   """)  
-    # Explanation of the diagram
+    # Enhanced explanation of the diagram
     st.markdown("""
    ### Diagram Explanation
-    This diagram shows how the Automotive Regulatory Document Assistant works:
-    1. **User Interface**: You enter your query and select a market
-    2. **Processing Pipeline**: The system analyzes your request
-    3. **Document Analysis**: Relevant documents are found and processed
-    4. **Answer Generation**: A comprehensive answer is created
+    This diagram shows the comprehensive architecture of the Automotive Regulatory Document Assistant:
+    
+    1. **User Interface Components**:
+       - User enters a query about automotive regulations
+       - Market selection allows focusing on specific regional rules (out of thousands of documents)
+    
+    2. **Core Processing Pipeline**:
+       - Query processing converts user input into structured formats
+       - Agent initialization sets up the regulatory search parameters
+       - Processing pipeline orchestrates the multiple steps needed for analysis
+    
+    3. **Data Collection Components**:
+       - Document retrieval locates relevant regulatory materials
+       - Web scraping extracts information from regulatory websites
+       - PDF processing handles documents in PDF format
+    
+    4. **Analysis Components**:
+       - Content chunking breaks down large documents for processing
+       - Document analysis extracts key regulatory information
+       - Market-specific rules apply regional regulations correctly
+    
+    5. **Response Generation**:
+       - Quality assurance ensures accuracy of information
+       - Answer generation provides comprehensive regulatory guidance
+    
+    6. **Support Systems**:
+       - Error handling monitors all processes for reliable execution
+       - Llama Gen-AI LLM provides the intelligence for all analysis
     """)      
        
     # Usage instructions
@@ -745,13 +782,19 @@ def main():
     1. Enter your query about automotive regulations
     2. Either select a specific market or let the system detect it
     3. Click "Process Query" to start the analysis
-    4. The system will identify relevant documents from all global regulatory databases and provide an accurate answer based on their content only
+    4. The system will identify relevant documents from global regulatory databases and provide an accurate answer
     
     ## Example queries
     - "What are the crash test requirements for passenger vehicles in the US?"
     - "Explain the emission standards for electric vehicles in the EU"
     - "What are the approval procedures for importing vehicles to Australia?"
+    - "What are the lighting requirements for commercial vehicles in India?"
+    - "Explain the latest child restraint system regulations in China"
     """)
+    
+    # Footer with contact info
+    st.markdown("---")
+    st.markdown("<div style='text-align: center; color: gray;'><small>For any query contact Neel Shah (neelshah.n0@gmail.com)</small></div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
