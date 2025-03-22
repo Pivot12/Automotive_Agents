@@ -37,7 +37,7 @@ def create_diagram_image():
         "Processing Pipeline": {"pos": (6, 1)},
         "Document Analysis": {"pos": (8, 1)},
         "Generate Answer": {"pos": (10, 1)},
-        "Groq LLM API": {"pos": (7, -1.5)},
+        "Llama Gen-AI LLM": {"pos": (7, -1.5)},
         "PDF Processing": {"pos": (8, -0.5)},
         "Error Handling": {"pos": (5, -1.5)}
     }
@@ -55,7 +55,7 @@ def create_diagram_image():
         "Processing Pipeline": "#a7c8f7",  # Deeper blue
         "Document Analysis": "#a7c8f7",    # Deeper blue
         "Generate Answer": "#a7c8f7",      # Deeper blue
-        "Groq LLM API": "#f9c5a1",         # Deeper peach
+        "Llama Gen-AI LLM": "#f9c5a1",         # Deeper peach
         "PDF Processing": "#a7c8f7",       # Deeper blue
         "Error Handling": "#f9b0b0"        # Deeper red
     }
@@ -73,9 +73,9 @@ def create_diagram_image():
     
     # Special edges to avoid label overlaps
     special_edges = [
-        ("Groq LLM API", "Processing Pipeline"),
-        ("Groq LLM API", "Document Analysis"),
-        ("Groq LLM API", "Generate Answer"),
+        ("Llama Gen-AI LLM", "Processing Pipeline"),
+        ("Llama Gen-AI LLM", "Document Analysis"),
+        ("Llama Gen-AI LLM", "Generate Answer"),
         ("Error Handling", "Processing Pipeline"),
         ("Error Handling", "Document Analysis")
     ]
@@ -100,9 +100,9 @@ def create_diagram_image():
     
     # Draw special edges (dashed lines) with curved paths to avoid nodes
     edge_styles = {
-        ("Groq LLM API", "Processing Pipeline"): {'rad': 0.3, 'style': 'dashed', 'color': 'gray'},
-        ("Groq LLM API", "Document Analysis"): {'rad': 0.2, 'style': 'dashed', 'color': 'gray'},
-        ("Groq LLM API", "Generate Answer"): {'rad': 0.4, 'style': 'dashed', 'color': 'gray'},
+        ("Llama Gen-AI LLM", "Processing Pipeline"): {'rad': 0.3, 'style': 'dashed', 'color': 'gray'},
+        ("Llama Gen-AI LLM", "Document Analysis"): {'rad': 0.2, 'style': 'dashed', 'color': 'gray'},
+        ("Llama Gen-AI LLM", "Generate Answer"): {'rad': 0.4, 'style': 'dashed', 'color': 'gray'},
         ("Error Handling", "Processing Pipeline"): {'rad': 0.3, 'style': 'dashed', 'color': 'gray'},
         ("Error Handling", "Document Analysis"): {'rad': 0.4, 'style': 'dashed', 'color': 'gray'}
     }
@@ -128,7 +128,7 @@ def create_diagram_image():
                    markersize=15, label='User Interface'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=node_colors["Initialize Agent"], 
                    markersize=15, label='Processing Components'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=node_colors["Groq LLM API"], 
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=node_colors["Llama Gen-AI LLM"], 
                    markersize=15, label='External API'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=node_colors["Error Handling"], 
                    markersize=15, label='Error Handling'),
@@ -732,7 +732,7 @@ def main():
                 st.code("""
                 User Input → Process Query → Initialize Agent → Processing Pipeline → Document Retrieval → Document Analysis → Generate Answer
                                                                       ↑                      ↑                 ↑                   ↑
-                                                                Groq LLM API connections (provides intelligence)
+                                                                Llama Gen-AI LLM connections (provides intelligence)
                                                                       ↑                      ↑                 ↑
                                                                 Error Handling (monitors process)
                                                                                             ↓
