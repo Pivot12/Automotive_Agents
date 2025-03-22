@@ -140,7 +140,7 @@ def create_diagram_image():
     
     # Remove axes and add a title
     plt.axis('off')
-    plt.title('Automotive Regulations AI Agent Architecture', fontsize=16, fontweight='bold', pad=20)
+    plt.title('Automotive Regulations AI Agent Architecture (Neel Shah neelshah.n0@gmail.com)', fontsize=16, fontweight='bold', pad=20)
     plt.tight_layout()
     
     # Save the plot to a BytesIO object
