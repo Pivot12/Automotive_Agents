@@ -140,7 +140,7 @@ def create_diagram_image():
     
     # Remove axes and add a title
     plt.axis('off')
-    plt.title('Automotive Regulations AI Agent Architecture (Neel Shah neelshah.n0@gmail.com)', fontsize=16, fontweight='bold', pad=20)
+    plt.title('Automotive Regulations AI Agent Architecture', fontsize=16, fontweight='bold', pad=20)
     plt.tight_layout()
     
     # Save the plot to a BytesIO object
@@ -721,7 +721,7 @@ def main():
                 # Create the diagram
                 diagram_image = create_diagram_image()
                 # Display the image
-                st.image(diagram_image, caption="Automotive Regulations AI Agent Architecture", use_container_width=True)
+                st.image(diagram_image, caption="Automotive Regulations AI Agent Architecture (Neel Shah neelshah.n0@gmail.com)", use_container_width=True)
                 # Add download option
                 img_str = get_image_base64(diagram_image)
                 href = f'<a href="data:image/png;base64,{img_str}" download="regulatory_agent_diagram.png">Download Diagram Image</a>'
