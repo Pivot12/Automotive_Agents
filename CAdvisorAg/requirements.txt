@@ -12,3 +12,4 @@ pillow
 matplotlib
 networkx
 pybase64
+pydantic
